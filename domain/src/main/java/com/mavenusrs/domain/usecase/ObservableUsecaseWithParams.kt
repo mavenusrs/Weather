@@ -2,20 +2,20 @@ package com.mavenusrs.domain.usecase
 
 import com.mavenusrs.domain.errorChecker.WeatherException
 import com.mavenusrs.domain.model.ResultState
-import io.reactivex.Single
+import io.reactivex.Observable
 
-abstract class SingleUsecaseWithParams<P, R : Any> {
+abstract class ObservableUsecaseWithParams<P, R : Any> {
 
-    fun execute(params: P): Single<ResultState<R>> {
+    fun execute(params: P): Observable<ResultState<R>> {
         return try {
             validate(params)
             run(params)
         } catch (weatherException: WeatherException) {
-            Single.error(weatherException)
+            Observable.error(weatherException)
         }
     }
 
     abstract fun validate(params: P)
 
-    abstract fun run(params: P): Single<ResultState<R>>
+    abstract fun run(params: P): Observable<ResultState<R>>
 }

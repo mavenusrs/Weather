@@ -6,18 +6,20 @@ import com.mavenusrs.domain.model.ResultState
 import com.mavenusrs.domain.model.Weather
 import com.mavenusrs.domain.model.WeatherRequest
 import com.mavenusrs.domain.repository.WeatherRespository
-import io.reactivex.Single
-import javax.xml.ws.http.HTTPException
+import io.reactivex.Observable
+import retrofit2.HttpException
 
-class WeatherUseCase(val weatherRespository: WeatherRespository) : SingleUsecaseWithParams<WeatherRequest, Weather>() {
-    override fun run(params: WeatherRequest): Single<ResultState<Weather>> {
+class WeatherUseCase(private val weatherRespository: WeatherRespository) : ObservableUsecaseWithParams<WeatherRequest, Weather>() {
+
+    override fun run(params: WeatherRequest): Observable<ResultState<Weather>> {
 
         return weatherRespository.getWeatherForcast(params.query, params.numberOfDays)
+            .toObservable()
             .map {
                 ResultState.Success(it) as ResultState<Weather>
             }.onErrorReturn {
-                if (it is HTTPException)
-                    ResultState.Failure(WeatherException(it.statusCode, it.message))
+                if (it is HttpException)
+                    ResultState.Failure(WeatherException(it.code(), it.message))
                 else
                     ResultState.Failure(WeatherException(GENERAL_SERVER_ERROR, it.message))
             }

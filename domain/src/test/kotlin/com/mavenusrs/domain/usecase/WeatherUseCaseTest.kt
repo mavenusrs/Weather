@@ -22,16 +22,16 @@ import org.mockito.junit.MockitoJUnitRunner
 class WeatherUseCaseTest {
 
     @Mock
-    lateinit var weatherRepository: WeatherRespository
+    private lateinit var weatherRepository: WeatherRespository
 
-    lateinit var weatherUseCase: WeatherUseCase
+    private lateinit var weatherUseCase: WeatherUseCase
 
-    val validQuery = "31.23,32.2423"
-    val numberOfDays = 4
+    private val validQuery = "31.23,32.2423"
+    private val numberOfDays = 4
 
-    val emptyQuery = ""
-    val invalidQuery = "31.2323,a"
-    val invalidNumberOfDays = 0
+    private val emptyQuery = ""
+    private val invalidQuery = "31.2323,a"
+    private val invalidNumberOfDays = 0
 
 
     @Before

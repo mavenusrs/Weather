@@ -9,6 +9,11 @@ data class Weather (val locationName: String,
     }
 
     override fun equals(other: Any?): Boolean {
-        return (other as Weather).toString() == toString()
+        other?.apply {
+            when(this){
+                is Weather -> return (other as Weather).toString() == toString()
+            }
+        }
+        return false
     }
 }

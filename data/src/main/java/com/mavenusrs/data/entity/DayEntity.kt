@@ -43,7 +43,7 @@ class DayEntity (
     @SerializedName("avghumidity")
     @Expose
     val avghumidity: Double,
-    @SerializedName("conditionEntity")
+    @SerializedName("condition")
     @Expose
     val conditionEntity: ConditionEntity,
     @SerializedName("uv")

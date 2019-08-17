@@ -7,9 +7,9 @@ class WeatherEntity (
     @SerializedName("location")
     @Expose
     val location: LocationEntity,
-    @SerializedName("currentEntity")
+    @SerializedName("current")
     @Expose
     val currentEntity: CurrentEntity,
-    @SerializedName("forecastEntity")
+    @SerializedName("forecast")
     @Expose
     val forecastEntity: ForecastEntity)

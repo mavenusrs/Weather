@@ -12,7 +12,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     kapt {
@@ -65,10 +65,12 @@ dependencies {
     api "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
     api "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     api "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}"
-    implementation "com.squareup.okhttp3:logging-interceptor:${okhttp3_version}"
+//    implementation "com.squareup.okhttp3:logging-interceptor:${okhttp3_version}"
 
     //Test
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-inline:${mockitoInlineVersion}"
+    testImplementation "androidx.arch.core:core-testing:${archTestingVersion}"
 
 
     androidTestImplementation 'androidx.test:runner:1.2.0'

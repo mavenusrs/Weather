@@ -20,7 +20,7 @@ class CurrentEntity (
     @SerializedName("is_day")
     @Expose
     val isDay: Int,
-    @SerializedName("conditionEntity")
+    @SerializedName("condition")
     @Expose
     val conditionEntity: ConditionEntity,
     @SerializedName("wind_mph")

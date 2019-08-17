@@ -7,7 +7,7 @@ import retrofit2.http.Query
 
 interface WeaterApi {
 
-    @GET("forecastEntity.json")
+    @GET("forecast.json")
     fun forcast(@Query("key") key: String, @Query("q") query: String,
                 @Query("days") days: Int): Single<WeatherEntity>
 

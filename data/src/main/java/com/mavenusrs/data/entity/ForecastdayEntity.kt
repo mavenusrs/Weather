@@ -10,10 +10,10 @@ class ForecastdayEntity (
     @SerializedName("date_epoch")
     @Expose
     val dateEpoch: Int,
-    @SerializedName("dayEntity")
+    @SerializedName("day")
     @Expose
     val dayEntity: DayEntity,
-    @SerializedName("astroEntity")
+    @SerializedName("astro")
     @Expose
     val astroEntity: AstroEntity
 
