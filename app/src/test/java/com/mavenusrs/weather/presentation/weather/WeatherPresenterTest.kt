@@ -125,7 +125,7 @@ class WeatherPresenterTest {
         Mockito.verify(errorObserver).onNext(weatherException)
 
     }
-    
+
 
 
     @Test
@@ -144,7 +144,6 @@ class WeatherPresenterTest {
     fun `test when permission is not granted`(){
 
         val weatherRequest = WeatherRequest(validQuery, numberOfDays)
-        val weather = Weather("Egypt", 44.0, arrayListOf())
 
         `when`(permissionHandler.checkHasPermission()).thenReturn(false)
         `when`(permissionHandler.requestPermission()).thenReturn(Single.just(PermissionHandler.PermissionResult.DENIED_SOFT))

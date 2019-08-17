@@ -10,7 +10,7 @@ fun Disposable.addsTo(disposableComposite: CompositeDisposable) {
 }
 
 fun Double.getDegreeWithCelsiusSympol(): String {
-    return "${this} \\u00B0"
+    return "${this} \u00B0"
 }
 
 fun String.toDayOfTheWeek(): String {

@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         weatherRV.setHasFixedSize(true)
         weatherRV.layoutManager = LinearLayoutManager(this)
 
-        val itemDecor = DividerItemDecoration(this, HORIZONTAL)
+        val itemDecor = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         weatherRV.addItemDecoration(itemDecor)
 
         val adapter = WeatherAdapter(forcastDays)
