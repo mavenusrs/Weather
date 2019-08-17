@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="loadingWidth">96dp</dimen>
+    <dimen name="weatherTopMargin">56dp</dimen>
+    <dimen name="weatherBottomMargin">62dp</dimen>
+    <dimen name="sheetItemPadding">16dp</dimen>
+    <dimen name="sheetItemHeight">96dp</dimen>
+    <dimen name="actionSheetTVSize">16sp</dimen>
+    <dimen name="countrtyTVSize">36sp</dimen>
+    <dimen name="degreeTVSize">96sp</dimen>
+    <dimen name="errorTVSize">54sp</dimen>
+    <dimen name="retryMarginTop">44dp</dimen>
+
+</resources>

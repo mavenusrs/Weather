@@ -1,46 +1,47 @@
 package com.mavenusrs.weather.presentation.weather
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
-import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.mavenusrs.data.common.BASE_URL
-import com.mavenusrs.data.remote.WeaterApi
-import com.mavenusrs.data.repository.WeatherRespositoryImpl
-import com.mavenusrs.domain.usecase.WeatherUseCase
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mavenusrs.weather.R
 import com.mavenusrs.weather.common.LOCATION_REQUEST_CODE
 import com.mavenusrs.weather.common.addsTo
-import com.mavenusrs.weather.location.MyLocation
+import com.mavenusrs.weather.model.ForecastdayViewModel
 import com.mavenusrs.weather.permission.PermissionDispatcher
 import com.mavenusrs.weather.permission.PermissionHandler
-import com.mavenusrs.weather.permission.PermissionHandlerImpl
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-import java.lang.ref.WeakReference
-import java.security.Permission
+import kotlinx.android.synthetic.main.activity_main.*
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import com.mavenusrs.domain.errorChecker.WeatherException
+import com.mavenusrs.weather.MyApplication
+import com.mavenusrs.weather.common.ErrorHandler
+import com.mavenusrs.weather.common.getDegreeWithCelsiusSympol
+import com.mavenusrs.weather.di.DomainModule
+import com.mavenusrs.weather.di.EndpointModule
+import com.mavenusrs.weather.di.HandlerModule
+import com.mavenusrs.weather.model.WeatherViewModel
+import kotlinx.android.synthetic.main.erorr_view.*
+import javax.inject.Inject
+
 
 class MainActivity : AppCompatActivity() {
 
+    @Inject
+    lateinit var weatherPresenter: WeatherPresenter
+    @Inject
+    lateinit var permissionDispatcher: PermissionDispatcher
+
     private val disposableComposite: CompositeDisposable = CompositeDisposable()
-    private lateinit var weatherPresenter: WeatherPresenter
-    private lateinit var permissionDispatcher: PermissionDispatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        weatherPresenter = getPresenter()
+        injectionDI()
 
         weatherPresenter.onForecastRequested()
 
@@ -51,77 +52,112 @@ class MainActivity : AppCompatActivity() {
         observeLocation()
     }
 
-    private fun getPresenter(): WeatherPresenter {
-        val okHttpClientBuilder = OkHttpClient.Builder()
-        val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
-
-        val retrofit = Retrofit.Builder().baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(okHttpClientBuilder.build())
-            .build()
-        val weaterApi = retrofit.create(WeaterApi::class.java)
-
-        val permissionHandler = PermissionHandlerImpl(
-            WeakReference(this), arrayOf(
-                ACCESS_COARSE_LOCATION,
-                ACCESS_FINE_LOCATION
-            ), LOCATION_REQUEST_CODE
-        )
-
-
-        permissionDispatcher = PermissionDispatcher(permissionHandler)
-        return WeatherPresenter(
-            WeatherUseCase(WeatherRespositoryImpl(weaterApi)),
-            permissionHandler,
-            CompositeDisposable(), MyLocation(WeakReference(this)), Schedulers.io(),
-            AndroidSchedulers.mainThread()
-        )
+    private fun injectionDI() {
+        val mainComponent = (application as MyApplication).getComponent()
+            .plus(DomainModule(), EndpointModule(), HandlerModule(this))
+        mainComponent.inject(this)
     }
 
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-       if (requestCode == LOCATION_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-           permissionDispatcher.dispatchResult(true)
+        if (requestCode == LOCATION_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            permissionDispatcher.dispatchResult(true)
         else
-           permissionDispatcher.dispatchResult(false)
+            permissionDispatcher.dispatchResult(false)
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
 
     }
 
-    private fun observeToWeatherRquest(){
+    private fun observeToWeatherRquest() {
+
         weatherPresenter.loadingSubjectTrigger.observer().subscribe {
-            Toast.makeText(this@MainActivity, "Loading", Toast.LENGTH_SHORT).show()
+            showProgress(true)
+            showErrorLayout(false)
+
         }.addsTo(disposableComposite)
 
         weatherPresenter.weatherSubjectTrigger.observer().subscribe {
-            Toast.makeText(this@MainActivity, it?.toString()?:"", Toast.LENGTH_SHORT).show()
+
+            showProgress(false)
+            showErrorLayout(false)
+
+            setupLayoutForWeather(it)
+
         }.addsTo(disposableComposite)
 
         weatherPresenter.errorSubjectTrigger.observer().subscribe {
-            Toast.makeText(this@MainActivity, "error code: ${it?.code?:0} error ${it?.message?:""}", Toast.LENGTH_SHORT).show()
+            showProgress(false)
+            showError(it)
         }.addsTo(disposableComposite)
     }
 
-    private fun observerPermission(){
+    private fun setupLayoutForWeather(it: WeatherViewModel) {
+        country.text = it.locationName
+        weatherDegreeTV.text = it.currentTempC.getDegreeWithCelsiusSympol()
+        setupAdapter(it.forecastday)
+    }
+
+    private fun showError(weatherException: WeatherException?) {
+        showErrorLayout(true)
+        retry.setOnClickListener { weatherPresenter.onForecastRequested() }
+        weatherErrorTV.text = weatherException?.let { ErrorHandler(it).getErrorMessage(this@MainActivity) }
+    }
+
+    private fun showErrorLayout(show: Boolean) {
+        errorLyt.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+
+    fun showProgress(show: Boolean) {
+        loadingProgressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    private fun observerPermission() {
         weatherPresenter.permissionBehaviorSubjectTrigger.observer().subscribe {
-            when(it){
+            when (it) {
                 PermissionHandler.PermissionResult.GRANTED ->
                     weatherPresenter.onForecastRequested()
                 PermissionHandler.PermissionResult.DENIED_HARD ->
-                    Toast.makeText(this@MainActivity, "Location permission Must be enabled to use this feature", Toast.LENGTH_SHORT).show()
-                else -> Toast.makeText(this@MainActivity, "Please, enable Location permission", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Location permission Must be enabled to use this feature",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                else -> Toast.makeText(
+                    this@MainActivity,
+                    "Please, enable Location permission",
+                    Toast.LENGTH_SHORT
+                ).show()
 
             }
         }.addsTo(disposableComposite)
 
     }
 
-    private fun observeLocation(){
+    private fun observeLocation() {
         weatherPresenter.showNotificationProviderDisabled.observer().subscribe {
-            Toast.makeText(this@MainActivity, "please, enable location provider ${it?:""}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, "please, enable location provider ${it ?: ""}", Toast.LENGTH_SHORT).show()
         }.addsTo(disposableComposite)
 
     }
+
+    private fun setupAdapter(forcastDays: List<ForecastdayViewModel>) {
+        weatherRV.setHasFixedSize(true)
+        weatherRV.layoutManager = LinearLayoutManager(this)
+
+        val itemDecor = DividerItemDecoration(this, HORIZONTAL)
+        weatherRV.addItemDecoration(itemDecor)
+
+        val adapter = WeatherAdapter(forcastDays)
+        weatherRV.adapter = adapter
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        weatherPresenter.unBound()
+        disposableComposite.clear()
+    }
 }
+

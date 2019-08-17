@@ -9,6 +9,7 @@ import com.mavenusrs.domain.model.WeatherRequest
 import com.mavenusrs.domain.usecase.WeatherUseCase
 import com.mavenusrs.weather.common.BehaviorSubjectTrigger
 import com.mavenusrs.weather.location.MyLocation
+import com.mavenusrs.weather.model.WeatherViewModel
 import com.mavenusrs.weather.permission.PermissionHandler
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -23,7 +24,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.mockito.internal.debugging.LocationImpl
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -57,7 +57,7 @@ class WeatherPresenterTest {
     @Mock
     private lateinit var loadingObserver: Observer<ResultState.Loading>
     @Mock
-    private lateinit var loadWeatherObserver: Observer<Weather>
+    private lateinit var loadWeatherObserver: Observer<WeatherViewModel>
     @Mock
     private lateinit var errorObserver: Observer<WeatherException>
 
@@ -84,6 +84,7 @@ class WeatherPresenterTest {
     fun `test Load Weather Long Happy Path`(){
         val weatherRequest = WeatherRequest(validQuery, numberOfDays)
         val weather = Weather("Egypt", 44.0, arrayListOf())
+        val weatherViewModel = WeatherViewModel("Egypt", 44.0, arrayListOf())
 
         `when`(location.longitude).thenReturn(validLon)
         `when`(location.latitude).thenReturn(validLat)
@@ -97,7 +98,7 @@ class WeatherPresenterTest {
         weatherPresenter.onForecastRequested()
 
         Mockito.verify(loadingObserver).onNext(ResultState.Loading)
-        Mockito.verify(loadWeatherObserver).onNext(weather)
+        Mockito.verify(loadWeatherObserver).onNext(weatherViewModel)
 
     }
 }

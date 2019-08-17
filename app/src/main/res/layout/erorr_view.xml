@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorErrorScreenBG">
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+        <TextView
+                android:id="@+id/weatherErrorTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/general_error_message"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorTVError"
+                android:textSize="@dimen/errorTVSize"
+                android:fontFamily="@font/roboto"/>
+
+        <Button android:id="@+id/retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/retryMarginTop"
+                android:background="@color/colorBtnBg"
+                android:text="@string/retry"
+                android:textColor="@color/colorTVError"/>
+    </LinearLayout>
+</RelativeLayout>

@@ -11,12 +11,15 @@ import com.mavenusrs.domain.usecase.WeatherUseCase
 import com.mavenusrs.weather.common.BehaviorSubjectTrigger
 import com.mavenusrs.weather.common.addsTo
 import com.mavenusrs.weather.location.MyLocation
+import com.mavenusrs.weather.model.WeatherViewModel
+import com.mavenusrs.weather.model.mapWeatherViewModel
 import com.mavenusrs.weather.permission.PermissionHandler
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
+import javax.inject.Inject
 import javax.inject.Named
 
-class WeatherPresenter(
+class WeatherPresenter @Inject constructor(
     private val weatherUseCase: WeatherUseCase,
     private val permissionHandler: PermissionHandler,
     private val disposableComposite: CompositeDisposable,
@@ -27,7 +30,7 @@ class WeatherPresenter(
     val permissionBehaviorSubjectTrigger = BehaviorSubjectTrigger<PermissionHandler.PermissionResult>()
     val showNotificationProviderDisabled = BehaviorSubjectTrigger<String>()
 
-    val weatherSubjectTrigger = BehaviorSubjectTrigger<Weather>()
+    val weatherSubjectTrigger = BehaviorSubjectTrigger<WeatherViewModel>()
     val loadingSubjectTrigger = BehaviorSubjectTrigger<ResultState.Loading>()
     val errorSubjectTrigger = BehaviorSubjectTrigger<WeatherException>()
 
@@ -78,7 +81,7 @@ class WeatherPresenter(
 
     private fun handleSuccessfullyResponse(weather: Weather) {
         handleloadingResponse(null)
-        weatherSubjectTrigger.trigger(weather)
+        weatherSubjectTrigger.trigger(mapWeatherViewModel(weather))
         Log.d("WeatherPresenter:", weather.toString())
 
     }

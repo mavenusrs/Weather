@@ -4,5 +4,5 @@ import com.mavenusrs.domain.model.Weather
 import io.reactivex.Single
 
 interface WeatherRespository{
-    fun getWeatherForcast( query: String, numberOfDays: Int):Single<Weather>
+    fun getWeatherForcast(query: String, numberOfDays: Int):Single<Weather>
 }

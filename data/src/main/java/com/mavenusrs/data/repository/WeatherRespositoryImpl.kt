@@ -7,7 +7,7 @@ import com.mavenusrs.domain.model.Weather
 import com.mavenusrs.domain.repository.WeatherRespository
 import io.reactivex.Single
 
-class WeatherRespositoryImpl(private val weatherApi: WeaterApi) :WeatherRespository{
+class WeatherRespositoryImpl (private val weatherApi: WeaterApi) : WeatherRespository{
 
     override fun getWeatherForcast(query: String, numberOfDays: Int): Single<Weather> {
         return weatherApi.forcast(WEATHER_KEY, query, days = numberOfDays)

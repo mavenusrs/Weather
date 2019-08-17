@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sheetItemHeight"
+                android:padding="@dimen/sheetItemPadding">
+
+    <TextView
+            android:id="@+id/dayOfWeekTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            android:gravity="center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:textColor="@color/colorPrimaryTV"
+            android:textSize="@dimen/actionSheetTVSize"
+            android:fontFamily="@font/roboto"/>
+
+    <TextView
+            android:id="@+id/degreeTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            android:gravity="center_horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/colorPrimaryTV"
+            android:textSize="@dimen/actionSheetTVSize"
+            android:fontFamily="@font/roboto"/>
+</RelativeLayout>

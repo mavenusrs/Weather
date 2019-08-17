@@ -9,7 +9,7 @@ import com.mavenusrs.domain.repository.WeatherRespository
 import io.reactivex.Observable
 import retrofit2.HttpException
 
-class WeatherUseCase(private val weatherRespository: WeatherRespository) : ObservableUsecaseWithParams<WeatherRequest, Weather>() {
+class WeatherUseCase (private val weatherRespository: WeatherRespository) : ObservableUsecaseWithParams<WeatherRequest, Weather>() {
 
     override fun run(params: WeatherRequest): Observable<ResultState<Weather>> {
 

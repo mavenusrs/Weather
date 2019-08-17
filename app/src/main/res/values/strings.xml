@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">weather</string>
+    <string name="retry">Retry</string>
+    <string name="general_error_message">Some Thing went wrong at our end!</string>
 </resources>
