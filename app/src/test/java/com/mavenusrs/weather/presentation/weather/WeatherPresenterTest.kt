@@ -21,9 +21,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -99,6 +100,62 @@ class WeatherPresenterTest {
 
         Mockito.verify(loadingObserver).onNext(ResultState.Loading)
         Mockito.verify(loadWeatherObserver).onNext(weatherViewModel)
+
+    }
+
+    @Test
+    fun `test Load Weather when error occured from backend`(){
+        val weatherRequest = WeatherRequest(validQuery, numberOfDays)
+
+        val weatherException = WeatherException(1, "")
+
+        `when`(location.longitude).thenReturn(validLon)
+        `when`(location.latitude).thenReturn(validLat)
+
+        `when`(permissionHandler.checkHasPermission()).thenReturn(true)
+        `when`(myLocation.requestLocation()).thenReturn(Single.just(location))
+        `when`(myLocation.disabledNotificationSubjectTrigger).thenReturn(BehaviorSubjectTrigger())
+        `when`(weatherUseCase.execute(weatherRequest)).thenReturn(
+            Observable.just(ResultState.Failure(weatherException)))
+
+        weatherPresenter.onForecastRequested()
+
+        Mockito.verify(loadingObserver).onNext(ResultState.Loading)
+
+        Mockito.verify(errorObserver).onNext(weatherException)
+
+    }
+    
+
+
+    @Test
+    fun `test there is no permission for location`(){
+        `when`(permissionHandler.checkHasPermission()).thenReturn(false)
+        `when`(permissionHandler.requestPermission()).thenReturn(Single.just(PermissionHandler.PermissionResult.GRANTED))
+        `when`(myLocation.disabledNotificationSubjectTrigger).thenReturn(BehaviorSubjectTrigger())
+
+        weatherPresenter.onForecastRequested()
+
+        Mockito.verify(permissionHandler, times(1)).requestPermission()
+
+    }
+
+    @Test
+    fun `test when permission is not granted`(){
+
+        val weatherRequest = WeatherRequest(validQuery, numberOfDays)
+        val weather = Weather("Egypt", 44.0, arrayListOf())
+
+        `when`(permissionHandler.checkHasPermission()).thenReturn(false)
+        `when`(permissionHandler.requestPermission()).thenReturn(Single.just(PermissionHandler.PermissionResult.DENIED_SOFT))
+        `when`(myLocation.disabledNotificationSubjectTrigger).thenReturn(BehaviorSubjectTrigger())
+
+        weatherPresenter.onForecastRequested()
+
+        Mockito.verify(permissionHandler, times(1)).requestPermission()
+        Mockito.verify(myLocation, times(0)).requestLocation()
+        Mockito.verify(weatherUseCase, times(0)).execute(weatherRequest)
+
 
     }
 }

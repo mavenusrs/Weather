@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -26,6 +27,9 @@ class ApplicationModule(private val application: MyApplication) {
     @Provides
     fun provideRetrofit(): Retrofit {
         val okHttpClientBuilder = OkHttpClient.Builder()
+        okHttpClientBuilder.readTimeout(60, TimeUnit.SECONDS);
+        okHttpClientBuilder.connectTimeout(60, TimeUnit.SECONDS);
+
         val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
 
         return Retrofit.Builder().baseUrl(BASE_URL)

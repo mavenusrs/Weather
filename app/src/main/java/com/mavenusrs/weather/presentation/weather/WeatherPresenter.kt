@@ -40,6 +40,8 @@ class WeatherPresenter @Inject constructor(
             permissionHandler.requestPermission().subscribe(::handlePermissionResult)
                 .addsTo(disposableComposite)
         } else {
+            loadingSubjectTrigger.trigger(ResultState.Loading)
+
             myLocation.requestLocation()
                 ?.subscribe(::getForcastWeather)
                 ?.addsTo(disposableComposite)
@@ -54,7 +56,6 @@ class WeatherPresenter @Inject constructor(
 
         val weatherRequest = WeatherRequest("${location.latitude},${location.longitude}", 4)
         weatherUseCase.execute(weatherRequest)
-            .startWith(ResultState.Loading)
             .subscribeOn(subscriberSchedular)
             .observeOn(observerSchedular)
             .subscribe({
